@@ -26,14 +26,16 @@ fs::path path_fragment2_shader = path_assets / fs::path("fragment_core2.fs");
 
 #include "graphics/shader.h"
 #include "graphics/texture.h"
+#include "graphics/material.h"
 #include "graphics/models/cube.hpp"
+#include "graphics/models/lamp.hpp"
+
 #include "io/Keyboard.h"
 #include "io/Mouse.h"
 #include "io/Joystick.h"
 #include "io/Camera.h"
 #include "io/Screen.h"
 
-void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(double dt);
 void printGlmMat4(const glm::mat4 &glm_mat4);
 
@@ -41,8 +43,8 @@ Joystick mainJ(0);
 
 float mixVal = 0.5f;
 
-unsigned int SCR_WIDTH  = 800;
-unsigned int SCR_HEIGHT = 600;
+unsigned int SCR_WIDTH  = 1080;
+unsigned int SCR_HEIGHT = 720;
 
 glm::mat4 mouseTransform = glm::mat4(1.0f);
 
@@ -78,13 +80,12 @@ int main()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COPMPAT, GL_TRUE);
 #endif
 
-    if (!screen.init())
+    if (!screen.init(1080, 720))
     {
         std::cout << "Could not create window." << std::endl;
         glfwTerminate();
         return -1;
     }
-
 
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
     {
@@ -97,12 +98,21 @@ int main()
 
     // Create depth buffer
     glEnable(GL_DEPTH_TEST);
+    fs::path path_assets_dir(ASSETS_DIR);
+    fs::path path_vs     = path_assets_dir / "object.vs";
+    fs::path path_fs     = path_assets_dir / "object.fs";
+    fs::path path_LampVs = path_assets_dir / "object.vs";
+    fs::path path_LampFs = path_assets_dir / "lamp.fs";
 
-    // SHADERS===============================
-    Shader shader("../assets/object.vs", "../assets/object.fs");
+    // Shader for object
+    Shader shader(path_vs.c_str(), path_fs.c_str());
+    Shader lampShader(path_vs.c_str(), path_LampFs.c_str());
 
-    Cube cube(glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.75f));
+    Cube cube(Material::copper, glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.75f));
     cube.init();
+
+    Lamp lamp(glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(-3.0f, -0.0f, -1.0f), glm::vec3(0.25f));
+    lamp.init();
 
     mainJ.update();
     if (mainJ.isPresent())
@@ -126,10 +136,12 @@ int main()
         screen.update();
 
         shader.activate();
-        shader.setFloat("mixVal", mixVal);
+        shader.set3Float("light.position", lamp.pos);
+        shader.set3Float("viewPos", cameras[activeCam].cameraPos);
 
-
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        shader.set3Float("light.ambient", lamp.ambient);
+        shader.set3Float("light.diffuse", lamp.diffuse);
+        shader.set3Float("light.specular", lamp.specular);
 
         // create transformation
         glm::mat4 model      = glm::mat4(1.0f);// local -> world
@@ -144,20 +156,25 @@ int main()
 
         cube.render(shader);
 
+        lampShader.activate();
+        lampShader.setMat4("view", view);
+        lampShader.setMat4("projection", projection);
+        lamp.render(lampShader);
+
+
         glBindVertexArray(0);
 
         // send new frame to window
         screen.newFrame();
     }
 
+    cube.cleanup();
+    lamp.cleanup();
+
     glfwTerminate();
     return 0;
 }
 
-void framebuffer_size_callback(GLFWwindow *window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-}
 
 void processInput(double dt)
 {

@@ -18,6 +18,14 @@ Screen::Screen()
 {
 }
 
+bool Screen::init(unsigned int width, unsigned int height)
+{
+    SCR_WIDTH  = width;
+    SCR_HEIGHT = height;
+
+    return init();
+}
+
 bool Screen::init()
 {
     window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "OpenGL Tutorial", nullptr, nullptr);

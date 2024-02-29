@@ -17,6 +17,7 @@ public:
     Screen();
 
     bool init();
+    bool init(unsigned int width, unsigned int height);
 
     void setParameters();
 
