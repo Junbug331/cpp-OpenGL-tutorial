@@ -13,6 +13,7 @@ Camera::Camera(const glm::vec3 &position)
       zoom(45.0f),
       cameraFront(glm::vec3(0.f, 0.f, -1.f))
 {
+    cameraStartPos = position;
     updateCameraVectors();
 }
 
@@ -75,6 +76,16 @@ void Camera::updateCameraZoom(double dy)
     {
         zoom = 45.0f;
     }
+}
+
+void Camera::reset()
+{
+    cameraPos = cameraStartPos;
+    yaw       = -90.f;
+    pitch     = 0.f;
+    zoom      = 45.f;
+
+    updateCameraVectors();
 }
 
 glm::mat4 Camera::getViewMatrix()

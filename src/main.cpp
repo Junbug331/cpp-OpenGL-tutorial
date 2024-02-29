@@ -231,6 +231,10 @@ void processInput(double dt)
     {
         cameras[activeCam].updateCameraPos(CameraDirection::DOWN, dt);
     }
+    if (Keyboard::keyWentDown(GLFW_KEY_SPACE))
+    {
+        cameras[activeCam].reset();
+    }
 
     double dx = Mouse::getDX(), dy = Mouse::getDY();
     if (dx != 0 || dy != 0)

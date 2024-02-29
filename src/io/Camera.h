@@ -44,10 +44,13 @@ public:
     inline float getPitch() const { return pitch; }
     inline float getSpeed() const { return speed; }
 
+    void reset();
+
     glm::mat4 getViewMatrix();
 
 private:
     void updateCameraVectors();
+    glm::vec3 cameraStartPos;
 };
 
 #endif
