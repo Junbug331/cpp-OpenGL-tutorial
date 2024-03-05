@@ -29,8 +29,10 @@ void Texture::generate()
 void Texture::load(bool flip)
 {
     stbi_set_flip_vertically_on_load(flip);
+
     unsigned char *data = stbi_load(path, &width, &height, &nChannels, 0);
-    GLenum colorMode    = GL_RGB;
+
+    GLenum colorMode = GL_RGB;
     switch (nChannels)
     {
         case 1:
@@ -39,14 +41,11 @@ void Texture::load(bool flip)
         case 4:
             colorMode = GL_RGBA;
             break;
-        default:
-            colorMode = GL_RGB;
-            break;
     }
 
     if (data)
     {
-        glBindTexture(GL_TEXTURE_2D, tex);
+        glBindTexture(GL_TEXTURE_2D, id);
         glTexImage2D(GL_TEXTURE_2D, 0, colorMode, width, height, 0, colorMode, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
@@ -77,7 +76,17 @@ void Texture::setWrap(GLenum s, GLenum t)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, t);
 }
 
-void Texture::bind()
+// void Texture::bind()
+// {
+//     glBindTexture(GL_TEXTURE_2D, tex);
+// }
+
+void Texture::setBorderColor(float borderColor[4])
 {
-    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+}
+
+void Texture::activate()
+{
+    glActiveTexture(GL_TEXTURE0 + id);
 }

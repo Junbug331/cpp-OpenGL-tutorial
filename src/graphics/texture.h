@@ -20,8 +20,9 @@ public:
     void setWrap(GLenum all);
     void setWrap(GLenum s, GLenum t);
 
-    void bind();
+    void setBorderColor(float borderColor[4]);
 
+    void activate();
 
     // texture object
     int id;
@@ -30,11 +31,13 @@ public:
 
 private:
     static int currentId;
-    const char *path;
 
+    // img properties
+    const char *path;
     int width;
     int height;
     int nChannels;
 };
+
 
 #endif

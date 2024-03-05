@@ -13,9 +13,15 @@ public:
     glm::vec3 pos;
     glm::vec3 size;
 
+    Cube() {}
 
     Cube(Material material, glm::vec3 pos, glm::vec3 size)
         : material(material), pos(pos), size(size) {}
+
+    void updatePose(const glm::vec3 &dpos)
+    {
+        pos += dpos;
+    }
 
     void init() override
     {
@@ -71,17 +77,21 @@ public:
         }
 
         fs::path path_assets_dir(ASSETS_DIR);
-        fs::path path_img1 = path_assets_dir / "image1.jpg";
-        fs::path path_img2 = path_assets_dir / "image2.png";
+        fs::path path_flag          = path_assets_dir / "flag.png";
+        fs::path path_flag_specular = path_assets_dir / "flag_specular.png";
+        fs::path path_img1          = path_assets_dir / "image1.jpg";
+        fs::path path_img2          = path_assets_dir / "image2.png";
 
-        Texture tex0(path_img1.c_str(), "texture0");
-        tex0.load();
-        Texture tex1(path_img2.c_str(), "texture1");
-        tex1.load();
+        Texture flag(path_flag.c_str(), "material.diffuse");
+        flag.load();
+        Texture flagSpec(path_flag_specular.c_str(), "material.specular");
+        flagSpec.load();
 
         meshes.push_back(Mesh(Vertex::genList(vertices, noVerticies),
                               indicies,
-                              {tex0, tex1}));
+                              {flag, flagSpec}));
+
+        std::cout << "cube initialized\n";
     }
 
     void render(Shader shader)
@@ -93,8 +103,8 @@ public:
         shader.setMat4("model", model);
 
         shader.set3Float("material.ambient", material.ambient);
-        shader.set3Float("material.diffuse", material.diffuse);
-        shader.set3Float("material.specular", material.specular);
+        // shader.set3Float("material.diffuse", material.diffuse);
+        // shader.set3Float("material.specular", material.specular);
         shader.setFloat("material.shininess", material.shininess);
 
         Model::render(shader);
