@@ -33,7 +33,7 @@ Mesh::Mesh()
 
 Mesh::Mesh(const std::vector<Vertex> &verticies,
            const std::vector<unsigned int> &indicies,
-           const std::vector<Texture> &textures)
+           std::vector<Texture> textures)
     : verticies(verticies), indicies(indicies), textures(textures)
 {
     setup();
@@ -71,10 +71,30 @@ void Mesh::setup()
 void Mesh::render(Shader shader)
 {
     // textures
+    unsigned int diffuseIdx  = 0;
+    unsigned int specularIdx = 0;
+
     for (unsigned int i = 0; i < textures.size(); ++i)
     {
-        shader.setInt(textures[i].name, textures[i].id);
-        textures[i].activate();
+        // activate textures
+        glActiveTexture(GL_TEXTURE0 + i);
+
+        // retrieve texture info
+        std::string name;
+        switch (textures[i].type)
+        {
+            case aiTextureType_DIFFUSE:
+                name = "diffuse" + std::to_string(diffuseIdx++);
+                break;
+            case aiTextureType_SPECULAR:
+                name = "specular" + std::to_string(specularIdx++);
+                break;
+        }
+
+        // set the shader value
+        shader.setInt(name, i);
+
+        // bind textures
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
     }
 

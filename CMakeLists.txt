@@ -11,6 +11,7 @@ find_package(glfw3 REQUIRED)
 find_package(glad CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(spdlog REQUIRED)
+find_package(assimp CONFIG REQUIRED)
 
 add_subdirectory(src/stb)
 
@@ -24,6 +25,7 @@ list(APPEND LINK_LIBS
     glad::glad
     glm::glm
     spdlog::spdlog
+    assimp::assimp
     stb
 )
 

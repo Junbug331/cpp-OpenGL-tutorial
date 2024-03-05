@@ -3,10 +3,13 @@
 struct Material
 {
 	vec3 ambient;
-	sampler2D diffuse;
-	sampler2D specular;
+	vec3 diffuse;
+	vec3 specular;
 	float shininess;	
 };
+
+uniform sampler2D diffuse0;
+uniform sampler2D specular0;
 
 #define MAX_POINT_LIGHTS 20
 struct PointLight
@@ -72,8 +75,8 @@ void main() {
 	// properties
 	vec3 norm = normalize(Normal);
 	vec3 viewDir = normalize(viewPos - FragPos);
-	vec3 texDiff = vec3(texture(material.diffuse, TexCoord));
-	vec3 texSpec = vec3(texture(material.specular, TexCoord));
+	vec3 texDiff = vec3(texture(diffuse0, TexCoord));
+	vec3 texSpec = vec3(texture(specular0, TexCoord));
 
 	vec3 result;
 
@@ -157,6 +160,7 @@ vec3 calcSpotLight(int idx, vec3 norm, vec3 viewDir, vec3 diffMap, vec3 specMap)
 
 		float intensity = (theta - spotLights[idx].outerCutOff) / (spotLights[idx].cutOff - spotLights[idx].outerCutOff);
 		intensity = clamp(intensity, 0.0, 1.0);
+
 		ambient *= intensity;
 		diffuse *= intensity;
 		specular *= intensity;

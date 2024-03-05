@@ -31,7 +31,7 @@ public:
     Mesh();
     Mesh(const std::vector<Vertex> &verticies,
          const std::vector<unsigned int> &indicies,
-         const std::vector<Texture> &textures);
+         std::vector<Texture> textures = {});
 
     void render(Shader shader);
     void cleanup();

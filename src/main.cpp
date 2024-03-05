@@ -31,6 +31,7 @@ fs::path path_fragment2_shader = path_assets / fs::path("fragment_core2.fs");
 #include "graphics/models/cube.hpp"
 #include "graphics/models/lamp.hpp"
 #include "graphics/light.h"
+#include "graphics/model.h"
 
 #include "io/Keyboard.h"
 #include "io/Mouse.h"
@@ -103,32 +104,14 @@ int main()
     fs::path path_fs     = path_assets_dir / "object.fs";
     fs::path path_LampVs = path_assets_dir / "object.vs";
     fs::path path_LampFs = path_assets_dir / "lamp.fs";
+    fs::path path_model  = path_assets_dir / fs::path("models/lotr_troll/scene.gltf");
 
     // Shader for object
     Shader shader(path_vs.c_str(), path_fs.c_str());
     Shader lampShader(path_vs.c_str(), path_LampFs.c_str());
 
-    glm::vec3 cubePositions[] = {
-            glm::vec3(0.0f, 0.0f, 0.0f),
-            glm::vec3(2.0f, 5.0f, -15.0f),
-            glm::vec3(-1.5f, -2.2f, -2.5f),
-            glm::vec3(-3.8f, -2.0f, -12.3f),
-            glm::vec3(2.4f, -0.4f, -3.5f),
-            glm::vec3(-1.7f, 3.0f, -7.5f),
-            glm::vec3(1.3f, -2.0f, -2.5f),
-            glm::vec3(1.5f, 2.0f, -2.5f),
-            glm::vec3(1.5f, 0.2f, -1.5f),
-            glm::vec3(-1.3f, 1.0f, -1.5f)};
-
-    // Cube cubes[10];
-    std::vector<Cube> cubes;
-    cubes.reserve(10);
-    for (unsigned int i = 0; i < 10; i++)
-    {
-        // cubes[i] = Cube(Material::gold, cubePositions[i], glm::vec4(1.0f));
-        cubes.emplace_back(Material::gold, cubePositions[i], glm::vec4(1.0f));
-        cubes.back().init();
-    }
+    Model m(glm::vec3(0.f, 0.f, -5.0f), glm::vec3(0.05));
+    m.loadModel(path_model.string());
 
     glm::vec3 pointLightPositions[] = {
             glm::vec3(0.7f, 0.2f, 2.0f),
@@ -206,10 +189,7 @@ int main()
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
 
-        for (int i = 0; i < cubes.size(); ++i)
-        {
-            cubes[i].render(shader);
-        }
+        m.render(shader);
 
         lampShader.activate();
         lampShader.setMat4("view", view);
@@ -223,10 +203,8 @@ int main()
         screen.newFrame();
     }
 
-    for (int i = 0; i < 10; ++i)
-    {
-        cubes[i].cleanup();
-    }
+    m.cleanup();
+
     for (int i = 0; i < 4; ++i)
     {
         lamps[i].cleanup();
